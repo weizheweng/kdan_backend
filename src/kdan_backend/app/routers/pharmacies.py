@@ -1,27 +1,32 @@
 # app/routers/pharmacies.py
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
-from sqlalchemy import asc, desc
+from fastapi import APIRouter, Depends, Path, Query
+from sqlalchemy import asc, desc, func, select
 from sqlalchemy.orm import Session
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 from datetime import time
 from app.database import get_db
 from app.models import Pharmacy, Mask, DayOfWeekEnum
-from app.schemas import Pharmacy as PharmacySchema, Mask as MaskSchema
+from app.schemas import MaskBase, Pharmacy as PharmacySchema, Mask as MaskSchema
 from app.utils.time_helper import is_open_now
 
+
 router = APIRouter(prefix="/pharmacies", tags=["Pharmacies"])
+
+@router.get("/all_pharmacies", response_model=List[PharmacySchema])
+def list_all_pharmacies(db: Session = Depends(get_db)):
+    """
+    撈全部藥局 (即 pharmacies 表內所有資料)
+    """
+    return db.query(Pharmacy).all()
 
 @router.get("/open", response_model=List[PharmacySchema])
 def get_open_pharmacies(day_of_week: DayOfWeekEnum, time_str: Optional[str], db: Session = Depends(get_db)):
     """
     List all pharmacies open at a specific time and on a day of week if requested.
     e.g. GET /pharmacies/open?day_of_week=Thur&time_str=14:00
-    若兩個參數都沒傳，回傳所有藥局。
     """
     query = db.query(Pharmacy)
     pharmacies = query.all()
-    if not day_of_week or not time_str:
-        return pharmacies  # 無參數則全部
 
     # 轉換 time_str -> time
     hour_min = time_str.split(":")
@@ -64,7 +69,7 @@ def list_masks_of_pharmacy(
 @router.get("/filter", response_model=List[PharmacySchema])
 def filter_pharmacies_mask_count(
     count_op: Literal["gt", "lt"],
-    count_val: int,
+    count_value: int,
     price_min: float,
     price_max: float,
     db: Session = Depends(get_db)
@@ -77,7 +82,6 @@ def filter_pharmacies_mask_count(
     subq = db.query(Mask.pharmacy_id).filter(Mask.price.between(price_min, price_max))
 
     # group by pharmacy_id, 並計算符合該區間的口罩數量
-    from sqlalchemy import func
     subq_count = (db.query(Mask.pharmacy_id, func.count(Mask.id).label("cnt"))
                   .filter(Mask.price.between(price_min, price_max))
                   .group_by(Mask.pharmacy_id)
@@ -88,17 +92,36 @@ def filter_pharmacies_mask_count(
 
     # 篩選 count_op
     if count_op == "gt":
-        query = query.filter(subq_count.c.cnt > count_val)
-    elif count_op == "lt":
-        query = query.filter(subq_count.c.cnt < count_val)
+        query = query.filter(subq_count.c.cnt > count_value)
     else:
-        raise HTTPException(status_code=400, detail="count_op must be 'gt' or 'lt'")
+        query = query.filter(subq_count.c.cnt < count_value)
 
     return query.all()
 
-@router.get("/all_masks", response_model=List[MaskSchema])
+@router.get("/all_masks", response_model=Dict[str, List[MaskBase]])
 def list_all_masks(db: Session = Depends(get_db)):
     """
     撈全部藥局的口罩 (即 masks 表內所有資料)
     """
-    return db.query(Mask).all()
+    query = (
+        select(
+            Mask.id,
+            Mask.name.label('mask_name'),
+            Mask.pharmacy_id,
+            Mask.price,
+            Pharmacy.name.label('pharmacy_name'),
+        )
+        .join(Pharmacy)
+    )
+    result = db.execute(query).all()
+    
+    # 將結果整理成以藥局為 key 的字典
+    grouped_masks = {}
+    for row in result:
+        data = dict(row._mapping)
+        pharmacy_name = data.pop('pharmacy_name')
+        if pharmacy_name not in grouped_masks:
+            grouped_masks[pharmacy_name] = []
+        grouped_masks[pharmacy_name].append(data)
+    
+    return grouped_masks

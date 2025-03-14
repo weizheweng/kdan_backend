@@ -82,3 +82,9 @@ class TopSpendersResponse(BaseModel):
 class TransactionSummary(BaseModel):
     total_masks: int
     total_dollar: float
+
+class MaskBase(BaseModel):
+    id: int
+    mask_name: str
+    price: float
+    pharmacy_id: int

@@ -7,7 +7,7 @@ from app.models import Pharmacy, Mask
 
 router = APIRouter(prefix="/search", tags=["Search"])
 
-@router.get("/")
+@router.get("")
 def search_pharmacies_and_masks(q: str, db: Session = Depends(get_db)):
     """
     Search for pharmacies or masks by name, ranked by 'relevance'.
