@@ -15,6 +15,7 @@ app = FastAPI(
 
 origins = [
     "http://localhost:3000",
+    "https://weizheweng.github.io/kdan_frontend"
 ]
 
 app.add_middleware(
