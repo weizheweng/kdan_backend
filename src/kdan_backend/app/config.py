@@ -11,14 +11,8 @@ if env:
 
 def get_database_url() -> str:
     """獲取資料庫連接字串"""
-    if env == 'dev' or env == None:
-        return (
+    return (
             f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
             f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
-        )
-    else:
-        return (
-            f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
-            f"@{os.getenv('POSTGRES_HOST')}/{os.getenv('POSTGRES_DB')}"
         )
     
