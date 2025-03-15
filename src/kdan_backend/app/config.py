@@ -1,12 +1,19 @@
 import os
+from dotenv import load_dotenv
 
-POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "8510")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "KDAN")
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+# 載入對應環境的 .env 文件
+env = os.getenv('ENV', 'dev')
+load_dotenv(f".env.{env}")
 
-DATABASE_URL = (
-    f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@"
-    f"{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-)
+def get_database_url() -> str:
+    """獲取資料庫連接字串"""
+    if env == 'dev':
+        return (
+            f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
+            f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+        )
+    else:
+        return (
+            f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
+            f"@{os.getenv('POSTGRES_HOST')}/{os.getenv('POSTGRES_DB')}"
+        )

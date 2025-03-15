@@ -5,13 +5,18 @@ import psycopg2
 import json
 import re
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+env = os.getenv('ENV', 'dev')
+load_dotenv(f".env.{env}")
 
 # ===【1) 資料庫連線設定】===
-DB_HOST = "localhost"
-DB_PORT = 5432
-DB_NAME = "KDAN"
-DB_USER = "postgres"
-DB_PASSWORD = 8510
+DB_HOST = os.getenv('POSTGRES_HOST')
+DB_PORT = os.getenv('POSTGRES_PORT') if os.getenv('POSTGRES_PORT') else 5432
+DB_NAME = os.getenv('POSTGRES_DB')
+DB_USER = os.getenv('POSTGRES_USER')
+DB_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 
 # === 2) 建立 ENUM 與五個資料表 (無 address, phone) ===
 def create_tables():

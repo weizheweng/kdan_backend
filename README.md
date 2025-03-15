@@ -8,6 +8,7 @@
   - [安裝](#安裝)
   - [安裝依賴](#安裝依賴)
   - [啟動虛擬環境](#啟動虛擬環境)
+  - [設定環境變量](#設定環境變量)
   - [建立資料庫](#建立資料庫)
   - [啟動 FastAPI 開發伺服器](#啟動-fastapi-開發伺服器)
   - [openAPI 文件](#openapi-文件)
@@ -53,9 +54,16 @@ source /Users/your_username/Library/Caches/pypoetry/virtualenvs/kdan-backend-000
 cd src/kdan_backend
 ```
 
+## 設定環境變量
+
+```bash
+cp .env .env.dev
+```
+
 ## 建立資料庫
 
 ```bash
+# 如果有建立兩個環境變數，指令前加上 ENV=dev or ENV=prod
 python3 etl.py
 ```
 
