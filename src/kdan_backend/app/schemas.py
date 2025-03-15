@@ -48,7 +48,6 @@ class Mask(MaskBase):
 # ---- User & PurchaseHistory ----
 class UserBase(BaseModel):
     name: str
-    cash_balance: float = 0
 
 class User(UserBase):
     id: int
@@ -85,6 +84,6 @@ class TransactionSummary(BaseModel):
 
 class MaskBase(BaseModel):
     id: int
-    mask_name: str
+    name: str
     price: float
     pharmacy_id: int

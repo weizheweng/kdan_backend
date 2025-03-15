@@ -106,7 +106,7 @@ def list_all_masks(db: Session = Depends(get_db)):
     query = (
         select(
             Mask.id,
-            Mask.name.label('mask_name'),
+            Mask.name,
             Mask.pharmacy_id,
             Mask.price,
             Pharmacy.name.label('pharmacy_name'),

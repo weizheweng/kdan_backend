@@ -15,7 +15,7 @@ from app.schemas import (
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.get("/", response_model=List[UserSchema])
+@router.get("", response_model=List[UserSchema])
 def list_users(db: Session = Depends(get_db)):
     return db.query(User).all()
 
