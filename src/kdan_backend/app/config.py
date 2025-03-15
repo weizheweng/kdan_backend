@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 # 載入對應環境的 .env 文件
-load_dotenv(".env")
+load_dotenv()
 
 # 如果有指定環境變數，則再載入對應的環境設定檔
 env = os.getenv('ENV')
