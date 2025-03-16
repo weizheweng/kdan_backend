@@ -1,0 +1,24 @@
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.Python
+**/.venv
+**/venv/
+
+# Version Control
+**/.git
+**/.gitignore
+
+# Testing
+**/.pytest_cache
+**/.coverage
+**/htmlcov/
+
+# IDE
+**/.vscode
+**/.idea
+
+# Misc
+**/.DS_Store
